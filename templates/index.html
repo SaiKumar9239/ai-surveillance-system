@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Surveillance Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(120deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+        }
+        .card {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            margin: 10px;
+            width: 200px;
+            border-radius: 10px;
+        }
+        button {
+            padding: 12px 25px;
+            margin: 8px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e82323;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🛡 AI Surveillance Dashboard</h1>
+
+<div class="card"><h3>Camera</h3><p id="cam">OFF</p></div>
+<div class="card"><h3>Mode</h3><p id="mode">NONE</p></div>
+<div class="card"><h3>Persons</h3><p id="count">0</p></div>
+<div class="card"><h3>Runtime</h3><p><span id="time">0</span> sec</p></div>
+
+<form action="/start" method="post">
+    <button name="mode" value="person">▶ Person</button>
+    <button name="mode" value="object">▶ Object</button>
+</form>
+
+<button onclick="fetch('/pause')">⏸ Pause</button>
+<button onclick="fetch('/resume')">▶ Resume</button>
+<button onclick="fetch('/stop')">⏹ Stop</button>
+
+<br><br>
+<a href="/evidence" style="color:white;">📂 View Evidence Gallery</a>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let lastAlertId = 0;
+
+setInterval(() => {
+    fetch("/status")
+        .then(r => r.json())
+        .then(d => {
+            cam.innerText = d.camera;
+            mode.innerText = d.mode;
+            count.innerText = d.person_count;
+            time.innerText = d.runtime;
+
+            if (d.alert && d.alert_id !== lastAlertId) {
+                lastAlertId = d.alert_id;
+                toast.innerText = d.alert;
+                toast.style.display = "block";
+                setTimeout(() => toast.style.display = "none", 2000);
+            }
+        });
+}, 1000);
+</script>
+
+</body>
+</html>
