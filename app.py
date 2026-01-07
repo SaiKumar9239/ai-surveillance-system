@@ -1,3 +1,4 @@
+# CI trigger test - minor comment change
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from ultralytics import YOLO
 import cv2
